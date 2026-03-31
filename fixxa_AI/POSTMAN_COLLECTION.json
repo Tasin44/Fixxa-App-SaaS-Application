@@ -1,0 +1,491 @@
+{
+	"info": {
+		"name": "Fixxa AI - Backend Integration",
+		"description": "Comprehensive API testing collection for Fixxa AI functions integrated with Django backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_postman_id": "fixxa-ai-collection-2026",
+		"version": "1.0.0"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "1. Health & Setup",
+			"item": [
+				{
+					"name": "Health Check - Database",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/health/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "health", ""]
+						},
+						"description": "Check if database connection is working and list available tables"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/health/",
+									"host": ["{{base_url}}"],
+									"path": ["api", "health", ""]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"body": "{\n  \"status\": \"healthy\",\n  \"database\": \"connected\",\n  \"tables\": [\n    \"user_information\",\n    \"client_information\",\n    \"quotes\",\n    \"quote_items\",\n    \"invoices\",\n    \"invoice_items\",\n    \"media_database\"\n  ],\n  \"message\": \"Database connection is working properly\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Test User IDs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users", ""]
+						},
+						"description": "Get available test user IDs for testing (optional endpoint)"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"url": "{{base_url}}/api/users/"
+							},
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"available_users\": {\n    \"alice\": \"fa830eb7-310e-4f9f-bb35-dff1d77e072d\",\n    \"bob\": \"e215f6bc-0341-4ff0-8375-6a84376731a7\",\n    \"charlie\": \"a64d2059-3dc7-44fc-8b11-88513d4c603d\"\n  },\n  \"note\": \"Use these user_ids for testing\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Health checks and setup endpoints"
+		},
+		{
+			"name": "2. Voice Processing - Quotes",
+			"item": [
+				{
+					"name": "Create Quote from Voice (Supabase)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"quote\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/voice/create-quote/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "voice", "create-quote", ""]
+						},
+						"description": "Fetch latest quote audio from Supabase, transcribe, extract data, and create quote in database"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"quote_id\": 123,\n  \"quote_number\": \"QT-2026-0001\",\n  \"client_name\": \"John Doe\",\n  \"total\": 1200.00,\n  \"transcription\": \"I would like to make a quote for John Doe...\",\n  \"message\": \"Quote created successfully from voice recording\",\n  \"client_data\": {\n    \"status\": \"quote\",\n    \"client_name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\",\n    \"service_type\": \"Plumbing\",\n    \"estimated_cost\": 1200.00,\n    \"services\": [\n      {\n        \"description\": \"Fix leaky pipes\",\n        \"service\": \"Plumbing\",\n        \"rate\": \"50/hr\",\n        \"duration\": \"4 hours\"\n      }\n    ],\n    \"materials\": [\n      {\n        \"material\": \"Pipes\",\n        \"quantity\": 2,\n        \"unit_price\": \"$100\",\n        \"amount\": \"$200\"\n      }\n    ]\n  }\n}"
+						},
+						{
+							"name": "Error Response - No Audio Found",
+							"status": "Internal Server Error",
+							"code": 500,
+							"body": "{\n  \"error\": \"No audio file found for status: quote\",\n  \"message\": \"Failed to create quote from voice\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Upload and Process Audio File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "audio_file",
+									"type": "file",
+									"src": "/path/to/audio.mp3"
+								},
+								{
+									"key": "type",
+									"value": "quote",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/voice/upload-audio/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "voice", "upload-audio", ""]
+						},
+						"description": "Upload audio file directly, transcribe, and extract data (without creating quote)"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"transcription\": \"I would like to make a quote...\",\n  \"client_data\": {\n    \"client_name\": \"Jane Smith\",\n    \"email\": \"jane@example.com\",\n    \"service_type\": \"Electrical\",\n    \"estimated_cost\": 500.00\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Transcribe Audio Only",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"audio_url\": \"https://supabase.co/storage/audio/file.mp3\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/voice/transcribe/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "voice", "transcribe", ""]
+						},
+						"description": "Just transcribe audio file to text (no data extraction)"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"transcription\": \"I would like to make a quote for my client John Doe...\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Voice processing endpoints for quote creation"
+		},
+		{
+			"name": "3. Voice Processing - Invoices",
+			"item": [
+				{
+					"name": "Create Invoice from Voice (Supabase)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"invoice\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/voice/create-invoice/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "voice", "create-invoice", ""]
+						},
+						"description": "Fetch latest invoice audio from Supabase, transcribe, extract data, and create invoice"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"invoice_id\": 456,\n  \"invoice_number\": \"INV-2026-0001\",\n  \"client_name\": \"Sarah Williams\",\n  \"total\": 2000.00,\n  \"transcription\": \"I would like to make an invoice for Sarah Williams...\",\n  \"message\": \"Invoice created successfully from voice recording\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Convert Quote to Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quote_id\": 123\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/invoices/convert-from-quote/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "invoices", "convert-from-quote", ""]
+						},
+						"description": "Convert existing quote to invoice (standard Django endpoint, not AI)"
+					},
+					"response": []
+				}
+			],
+			"description": "Voice processing endpoints for invoice creation"
+		},
+		{
+			"name": "4. Natural Language Chatbot",
+			"item": [
+				{
+					"name": "Query - Client Information",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"Show me all my clients\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Ask about client information in natural language"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"question\": \"Show me all my clients\",\n  \"sql_query\": \"SELECT name, email, phone_number FROM client_information WHERE user_id = 'fa830eb7-310e-4f9f-bb35-dff1d77e072d'\",\n  \"answer\": \"You have 15 clients. Here are their names: John Doe, Jane Smith, Bob Johnson...\",\n  \"raw_data\": \"[('John Doe', 'john@example.com', '123-456-7890'), ...]\",\n  \"user_id\": \"fa830eb7-310e-4f9f-bb35-dff1d77e072d\",\n  \"timestamp\": \"2026-01-07T10:30:00\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Query - Invoice Analytics",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"What are my total unpaid invoices this month?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Ask about invoice analytics"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"question\": \"What are my total unpaid invoices this month?\",\n  \"sql_query\": \"SELECT SUM(total) FROM invoices WHERE user_id = 'xxx' AND payment_status = 'unpaid' AND EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)\",\n  \"answer\": \"You have $5,200 in unpaid invoices this month.\",\n  \"raw_data\": \"[(5200.00,)]\",\n  \"user_id\": \"fa830eb7-310e-4f9f-bb35-dff1d77e072d\",\n  \"timestamp\": \"2026-01-07T10:30:00\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Query - Quote Analytics",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"How many quotes did I send this year?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Ask about quote statistics"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"question\": \"How many quotes did I send this year?\",\n  \"answer\": \"You sent 48 quotes this year.\",\n  \"sql_query\": \"SELECT COUNT(*) FROM quotes WHERE user_id = 'xxx' AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)\",\n  \"raw_data\": \"[(48,)]\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Query - Revenue Analytics",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"What's my total revenue from paid invoices?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Ask about revenue and financial analytics"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"question\": \"What's my total revenue from paid invoices?\",\n  \"answer\": \"Your total revenue from paid invoices is $125,450.\",\n  \"sql_query\": \"SELECT SUM(total) FROM invoices WHERE user_id = 'xxx' AND payment_status = 'paid'\",\n  \"raw_data\": \"[(125450.00,)]\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Query - Media Files",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"Show me all audio files I uploaded this week\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Ask about media files and documents"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n  \"success\": true,\n  \"question\": \"Show me all audio files I uploaded this week\",\n  \"answer\": \"You uploaded 3 audio files this week: quote_20260105.mp3, invoice_20260106.mp3, quote_20260107.mp3\",\n  \"sql_query\": \"SELECT name FROM media_database WHERE user_id = 'xxx' AND media_type = 'audio' AND created_at >= CURRENT_DATE - INTERVAL '7 days'\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Natural language to SQL chatbot endpoints"
+		},
+		{
+			"name": "5. Example Chat Questions",
+			"item": [
+				{
+					"name": "Client Management Examples",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"List all my clients with their contact information\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Examples:\n- List all my clients with their contact information\n- How many clients do I have?\n- Show me clients added this month\n- Find client by name John\n- What's the email for client XYZ?"
+					}
+				},
+				{
+					"name": "Invoice Management Examples",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"Show me all invoices for client John Smith\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Examples:\n- What are my unpaid invoices?\n- Show me all invoices for client John Smith\n- What's my total revenue this quarter?\n- List invoices created in December 2025\n- Which invoices are overdue?"
+					}
+				},
+				{
+					"name": "Business Analytics Examples",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question\": \"What's my average invoice amount?\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat/query/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "chat", "query", ""]
+						},
+						"description": "Examples:\n- What's my total revenue year to date?\n- How many invoices did I send this month?\n- What's my average invoice amount?\n- Show me my top 5 clients by revenue\n- What's the total value of all my quotes?"
+					}
+				}
+			],
+			"description": "Collection of example questions you can ask the chatbot"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "your-django-auth-token-here",
+			"type": "string"
+		}
+	]
+}

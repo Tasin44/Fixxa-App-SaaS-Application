@@ -1,0 +1,130 @@
+# ============ PYTHON ============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ============ ENVIRONMENT & CREDENTIALS ============
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+*.pem
+*.key
+*.cert
+*.p12
+firebase-credentials.json
+secrets/
+
+# ============ DATABASE ============
+db.sqlite3
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# ============ MEDIA & UPLOADS ============
+media/
+staticfiles/
+*.log
+*.pot
+local_settings.py
+
+# ============ IDE & EDITORS ============
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.env
+.env.example
+
+# ============ TESTING ============
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.hypothesis/
+
+# ============ OS SPECIFIC ============
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ============ TEMPORARY FILES ============
+temp/
+tmp/
+*.tmp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.cache/
+
+# ============ DOCKER ============
+docker-compose.override.yml
+.dockerignore
+
+# ============ CELERY ============
+celerybeat-schedule
+dump.rdb
+
+# ============ NODE/FRONTEND ============
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+dist/
+build/
+
+# ============ RUNTIME ============
+*.pid
+*.seed
+*.pid.lock
+
+# ============ STRIPE & PAYMENT ============
+.stripe-keys
+
+# ============ AI MODULES ============
+fixxa_AI/__pycache__/
+fixxa_AI/*.pyc
+fixxa_AI/temp/
+
+# ============ CUSTOM ============
+temp_audio/
+temp_uploads/

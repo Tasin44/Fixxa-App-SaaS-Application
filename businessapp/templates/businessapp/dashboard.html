@@ -1,0 +1,169 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    
+
+    {% if onboard_status == "success" %}
+    <h1>Congratulations!</h1>
+        <p style="color: green;">🎉 Stripe onboarding completed successfully!Now you’re ready to get paid</p>
+    {% elif onboard_status == "error" %}
+        <p style="color: red;">⚠️ Stripe onboarding failed. Please try again.</p>
+    {% else %}
+        <p>Welcome to your dashboard!</p>
+    {% endif %}
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .dashboard-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background-color: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .welcome-message {
+            color: #4a5568;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: #edf2f7;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Business Dashboard</h1>
+        </div>
+
+        {% if onboard_status == "success" %}
+            <div class="success-message">
+                <h2>🎉 Congratulations!</h2>
+                <p>Your Stripe onboarding is complete! You're now ready to accept payments.</p>
+                        {% if account_id %}
+                          <p><strong>Your Stripe Account ID:</strong> {{ account_id }}</p>
+                        {% endif %}
+            </div>
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Account Status</h3>
+                    <div class="stat-value">Active</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Payment Ready</h3>
+                    <div class="stat-value">✓</div>
+                </div>
+            </div>
+        {% elif onboard_status == "error" %}
+            <div class="error-message">
+                <h2>⚠️ Attention Required</h2>
+                <p>Stripe onboarding encountered an issue. Please try again or contact support.</p>
+            </div>
+        {% else %}
+            <div class="issue-message">
+                <h2>Something Wrong!</h2>
+                <p>Your stripe verification incomplete. Please complete the stripe onboarding again by clicking "Stripe Payment Setup" on the settings.</p>
+                        <!-- {% if account_id %}
+                              <p><strong>Your Stripe Account ID:</strong> {{ account_id }}</p>
+                         {% endif %} -->
+            </div>
+                <!-- <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Account Status</h3>
+                        <div class="stat-value">Active</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Payment Ready</h3>
+                        <div class="stat-value">✓</div>
+                    </div>
+              </div> -->
+        {% endif %}
+    </div>
+</body>
+</html>
+
