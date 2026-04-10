@@ -688,6 +688,9 @@ class NewQuoteCreateSerializer(serializers.Serializer):
     items = NewQuoteItemSerializer(many=True)
 
 class NewInvoiceCreateSerializer(serializers.Serializer):
+    TYPE_CHOICES = (('manual', 'manual'), ('smart', 'smart'))
+
+    type = serializers.ChoiceField(choices=TYPE_CHOICES, required=False, default='manual')
     client = serializers.IntegerField()
     vat_rate = serializers.DecimalField(max_digits=5, decimal_places=2, default=0)
     issue_date = serializers.DateField()

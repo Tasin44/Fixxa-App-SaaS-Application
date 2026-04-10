@@ -2779,14 +2779,25 @@ class NewInvoiceCreateView(StandardResponseMixin, APIView):
             serializer.is_valid(raise_exception=True)
             data = serializer.validated_data
 
+            # Read from request first so it works even if serializer doesn't include `type` yet.
+            invoice_type = str(request.data.get("type", data.get("type", "manual"))).strip().lower()
+            if invoice_type == "manul":
+                invoice_type = "manual"
+            if invoice_type not in ["manual", "smart"]:
+                return self.error_response(
+                    "Invalid type. Use 'manual' or 'smart'.",
+                    status.HTTP_400_BAD_REQUEST
+                )
+            
             try:
                 client = Client.objects.get(id=data['client'], user=request.user)
             except Client.DoesNotExist:
                 return self.error_response("Client not found", 404)
-
-            connected_id = request.user.business_profile.stripe_account_id if hasattr(request.user, 'business_profile') else None
-            if not connected_id:
-                return self.error_response("Complete Stripe onboarding first", 400)
+            # Stripe required only for smart invoices
+            if invoice_type == "smart":
+                connected_id = request.user.business_profile.stripe_account_id if hasattr(request.user, 'business_profile') else None
+                if not connected_id:
+                    return self.error_response("Complete Stripe onboarding first to activate smart payment", 400)
 
             folder = ensure_client_folder(request.user, client)
 
@@ -2836,19 +2847,21 @@ class NewInvoiceCreateView(StandardResponseMixin, APIView):
                 invoice.total = subtotal + vat_amount
                 invoice.save(update_fields=['subtotal', 'total'])
 
-                payment_link = create_stripe_payment_link(invoice)
-                if not payment_link:
-                    raise Exception("Stripe payment link creation failed")
+                # Only smart invoices get Stripe payment link
+                if invoice_type == "smart":
+                    payment_link = create_stripe_payment_link(invoice)
+                    if not payment_link:
+                        raise Exception("Stripe payment link creation failed")
 
-                invoice.payment_link = payment_link
-                invoice.save(update_fields=['payment_link'])
-                # if payment_link:
-                #     invoice.payment_link = payment_link
-                #     invoice.save(update_fields=['payment_link'])
+                    invoice.payment_link = payment_link
+                    invoice.save(update_fields=['payment_link'])
 
             invoice = Invoice.objects.prefetch_related('items').get(pk=invoice.pk)
             response_serializer = NewInvoiceResponseSerializer(invoice, context={'request': request})
             return self.success_response(response_serializer.data, "Invoice created successfully", 201)
 
+        except serializers.ValidationError as e:
+            return self.error_response(str(e.detail), status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return self.error_response(f"Failed to create invoice: {e}", 500)
+            
