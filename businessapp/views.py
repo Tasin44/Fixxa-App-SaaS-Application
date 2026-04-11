@@ -51,7 +51,8 @@ class BusinessProfileCreateUpdateView(APIView):
         serializer = BusinessProfileCreateUpdateSerializer(
             business, 
             data=request.data, 
-            partial=True
+            partial=True,
+            context={'request': request}
         )
         
         if serializer.is_valid():
@@ -74,7 +75,7 @@ class BusinessProfileCreateUpdateView(APIView):
         """Get current user's business profile"""
         try:
             business = request.user.business_profile
-            serializer = BusinessProfileCreateUpdateSerializer(business)
+            serializer = BusinessProfileCreateUpdateSerializer(business,context={'request': request})
             return Response({
                 "success": True,
                 "statusCode": status.HTTP_200_OK,
@@ -123,7 +124,8 @@ class BusinessProfileCreateUpdateView(APIView):
         serializer = BusinessProfileCreateUpdateSerializer(
             business,
             data=request.data,
-            partial=True
+            partial=True,
+            context={'request': request}
         )
 
         if serializer.is_valid():

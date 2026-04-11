@@ -46,6 +46,7 @@ db.sqlite3
 *.sqlite
 *.sqlite3
 postgres_data/
+data/
 
 # ============ MEDIA & UPLOADS ============
 media/

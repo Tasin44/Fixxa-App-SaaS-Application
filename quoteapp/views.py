@@ -2748,8 +2748,13 @@ class NewQuoteCreateView(StandardResponseMixin, APIView):
                     quote=quote,
                     expires_at=timezone.now() + timedelta(days=30)
                 )
+                '''
                 quote.accept_link = f"{settings.BASE_URL}/quoteapp/quotes/{quote.quote_id}/accept/?token={quote_token.token}"
                 quote.reject_link = f"{settings.BASE_URL}/quoteapp/quotes/{quote.quote_id}/reject/?token={quote_token.token}"
+                '''
+                base_url = settings.BASE_URL.rstrip('/') if settings.BASE_URL else request.build_absolute_uri('/').rstrip('/')
+                quote.accept_link = f"{base_url}/quoteapp/quotes/{quote.quote_id}/accept/?token={quote_token.token}"
+                quote.reject_link = f"{base_url}/quoteapp/quotes/{quote.quote_id}/reject/?token={quote_token.token}"
                 quote.save(update_fields=['accept_link', 'reject_link'])
                 '''
                 #if we want to make the quote status always 'sent' after creating a quote 

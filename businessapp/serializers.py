@@ -37,7 +37,15 @@ class BusinessProfileCreateUpdateSerializer(serializers.ModelSerializer):
         return value.strip()
 
 
-
+    def get_logo(self, obj):
+        if not obj.logo:
+            return None
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.logo.url)
+        from django.conf import settings
+        base = (getattr(settings, 'BASE_URL', '') or '').rstrip('/')
+        return f"{base}{obj.logo.url}" if base else obj.logo.url
 
 
 

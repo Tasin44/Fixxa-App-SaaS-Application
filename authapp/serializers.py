@@ -114,7 +114,7 @@ class SignupSerializer(serializers.Serializer):
         If you did not request this, please ignore this email.
 
         Best regards,  
-        Fixa Support Team
+        Fixxa Support Team
         """
         #send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
         send_mail(

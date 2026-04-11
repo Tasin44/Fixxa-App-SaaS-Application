@@ -212,7 +212,20 @@ then yes — order_by('-id') is the cleanest and fastest choice.
         """
         context = super().get_serializer_context()
         context['request'] = self.request
-        return context      
+        return context 
+    
+    def _client_list_version_key(self, user_id):
+        return f"client_list_version_{user_id}"
+
+    def _get_client_list_version(self, user_id):
+        return cache.get(self._client_list_version_key(user_id), 1)
+
+    def _bump_client_list_version(self, user_id):
+        key = self._client_list_version_key(user_id)
+        try:
+            cache.incr(key)
+        except ValueError:
+            cache.set(key, 2, None)     
     
     def list(self, request, *args, **kwargs):
         """
@@ -221,7 +234,9 @@ then yes — order_by('-id') is the cleanest and fastest choice.
         """
         try:
             # Build cache key based on user and filters
-            cache_key = f"client_list_{request.user.id}_{request.GET.urlencode()}"
+            #cache_key = f"client_list_{request.user.id}_{request.GET.urlencode()}"
+            version = self._get_client_list_version(request.user.id)
+            cache_key = f"client_list_v{version}_{request.user.id}_{request.GET.urlencode()}"
             
             # Try to get from cache first
             cached_data = cache.get(cache_key)
@@ -337,10 +352,13 @@ then yes — order_by('-id') is the cleanest and fastest choice.
                 # Re-query to include prefetched/annotated data
                 client = self.get_queryset().get(id=client.id)               
                 # Invalidate cache for this user
-                cache.delete_pattern(f"client_list_{request.user.id}_*")
+                #cache.delete_pattern(f"client_list_{request.user.id}_*")
+                self._bump_client_list_version(request.user.id)
+                cache.delete(f"client_stats_{request.user.id}")
                 
                 # Return detailed client data
-                detail_serializer = ClientDetailSerializer(client)
+                ##detail_serializer = ClientDetailSerializer(client)
+                detail_serializer = ClientDetailSerializer(client, context={'request': request})
                 
             return self.success_response(
                 detail_serializer.data,
@@ -391,7 +409,9 @@ then yes — order_by('-id') is the cleanest and fastest choice.
                 # Re-query to include prefetched/annotated data
                 client = self.get_queryset().get(id=client.id)          
                 # Invalidate cache
-                cache.delete_pattern(f"client_list_{request.user.id}_*")
+                #cache.delete_pattern(f"client_list_{request.user.id}_*")
+                self._bump_client_list_version(request.user.id)
+                cache.delete(f"client_stats_{request.user.id}")
                 cache.delete(f"client_detail_{client.id}")
                 
                 # Return detailed client data
@@ -519,10 +539,13 @@ then yes — order_by('-id') is the cleanest and fastest choice.
                 client = Client.objects.create(**client_data)
                 
                 # Invalidate cache
-                cache.delete_pattern(f"client_list_{request.user.id}_*")
-                
+                #cache.delete_pattern(f"client_list_{request.user.id}_*")
+                self._bump_client_list_version(request.user.id)
+                cache.delete(f"client_stats_{request.user.id}")
+                                
                 # Return detailed client data
-                detail_serializer = ClientDetailSerializer(client)
+                #detail_serializer = ClientDetailSerializer(client)
+                detail_serializer = ClientDetailSerializer(client, context={'request': request})
             
             return self.success_response(
                 detail_serializer.data,
@@ -721,7 +744,9 @@ then yes — order_by('-id') is the cleanest and fastest choice.
                 client.save(update_fields=['is_deleted', 'deleted_at'])
                 
                 # Invalidate cache
-                cache.delete_pattern(f"client_list_{request.user.id}_*")
+                #cache.delete_pattern(f"client_list_{request.user.id}_*")
+                self._bump_client_list_version(request.user.id)
+                cache.delete(f"client_stats_{request.user.id}")
             
             return self.success_response(
                 {"client_id": client.id},

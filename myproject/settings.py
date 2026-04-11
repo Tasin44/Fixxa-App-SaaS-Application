@@ -15,15 +15,9 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 # ============ SECURITY SETTINGS ============
 SECRET_KEY = env('SECRET_KEY', default='change-me-in-production!')
-# DEBUG = env('DEBUG')
-# ALLOWED_HOSTS = env('ALLOWED_HOSTS')
-# # Add this line specifically for your tunnel
-# if DEBUG:
-#     ALLOWED_HOSTS += ['*.devtunnels.ms']
-
-DEBUG = True
-ALLOWED_HOSTS = ['*']
-BASE_URL='https://6zpmb4x8-8008.inc1.devtunnels.ms/'
+DEBUG = env.bool('DEBUG', default=False)
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+BASE_URL = env('BASE_URL', default='')
 
 if not DEBUG:
     # Production security
@@ -88,25 +82,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-# ============ DATABASE ============
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  
-        'NAME': BASE_DIR / 'db.sqlite3',  
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': env('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
+        'USER': env('DB_USER', default=''),
+        'PASSWORD': env('DB_PASSWORD', default=''),
+        'HOST': env('DB_HOST', default=''),
+        'PORT': env('DB_PORT', default=''),
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': env('DB_ENGINE'),
-#         'NAME': env('DB_NAME'),
-#         'USER': env('DB_USER'),
-#         'PASSWORD': env('DB_PASSWORD'),
-#         'HOST': env('DB_HOST'),
-#         'PORT': env('DB_PORT'),
-#         'ATOMIC_REQUESTS': True, 
-#     }
-# }
 
 # ============ PASSWORD VALIDATION ============
 AUTH_PASSWORD_VALIDATORS = [
@@ -132,22 +118,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============ CORS SETTINGS ============
-CORS_ALLOWED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
-# CORS_ALLOW_CREDENTIALS = True
-# CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
-# ============ CORS SETTINGS ============
 CORS_ALLOW_CREDENTIALS = True
-
-# Hardcoded to avoid .env parsing issues
-CSRF_TRUSTED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     "http://localhost:8008",
-    "http://localhost:8019"
-]
-
-CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8019",
+])
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     "http://localhost:8008",
     "http://127.0.0.1:8008",
-]
+])
 
 # ============ REST FRAMEWORK ============
 REST_FRAMEWORK = {
