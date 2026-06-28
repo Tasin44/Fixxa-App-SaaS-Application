@@ -1,6 +1,19 @@
-﻿# Fixxa App SaaS Backend
+# Fixxa App SaaS Backend
+
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.leevincent.fixxa)
 
 A production-oriented Django REST backend for service businesses to manage clients, create quotes/invoices, accept payments, and automate workflows with AI, notifications, and integrations.
+
+## App Screenshots
+
+<p align="center">
+  <img src="image/1_onboarding.png" width="250" alt="Onboarding" />
+  <img src="image/2_login.png" width="250" alt="Login" />
+  <img src="image/3_home.png" width="250" alt="Home" />
+  <img src="image/4_voice_invoice_creation.png" width="250" alt="Voice Invoice Creation" />
+  <img src="image/5_invoice_pdf.png" width="250" alt="Invoice PDF" />
+  <img src="image/6_payment.png" width="250" alt="Payment" />
+</p>
 
 ## Overview
 
